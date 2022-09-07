@@ -52,10 +52,13 @@ func serveUser(){
 
 
 func Setup(){
-	host := os.Getenv("PSQL_HOST")
+	host := os.Getenv("DATABASE-HOST")
 	pgPort := os.Getenv("PSQL_PORT")
+	pgUser := os.Getenv("DATABASE-USERNAME")
+	pgPass := os.Getenv("DATABASE-PASSWORD")
+		
+	dsn := fmt.Sprintf("user=%s password=%s host=%s dbname=%s  port=%s sslmode=%s", pgUser, pgPass, host,"postgres", pgPort, dbMode)
 
-	dsn := "host=postgresql user=root password=password dbname=interview_accountapi port=5432"
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
