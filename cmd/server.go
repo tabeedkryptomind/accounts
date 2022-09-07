@@ -56,7 +56,7 @@ func Setup(){
 	pgPort := os.Getenv("PSQL_PORT")
 	pgUser := os.Getenv("DATABASE-USERNAME")
 	pgPass := os.Getenv("DATABASE-PASSWORD")
-		
+	dbMode := os.Getenv("DATABASE-SSL-MODE")
 	dsn := fmt.Sprintf("user=%s password=%s host=%s dbname=%s  port=%s sslmode=%s", pgUser, pgPass, host,"postgres", pgPort, dbMode)
 
 	var err error
