@@ -1,24 +1,22 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 
 	app "github.com/form3tech-oss/interview-accountapi/app/server"
-	"github.com/form3tech-oss/interview-accountapi/models"
+	"github.com/form3tech-oss/interview-accountapi/logs"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 
 const (
-	port = ":8081"
+	port = ":8080"
 )
 
-var DB *gorm.DB
+var Client *gorm.DB
 
 var accountsCmd = &cobra.Command{
 	Use: "serve",
@@ -42,31 +40,24 @@ func serveUser(){
 		})
 
 		v1.POST("/create",accounts.CreateAccount)
+		v1.GET("/ac", accounts.GetAccounts)
+		v1.DELETE("/:id", accounts.DeleteAccount)
 	}
 
 	srv.Run(port)
 }
 
 
-
-
-
 func Setup(){
-	host := os.Getenv("DATABASE-HOST")
-	pgPort := os.Getenv("PSQL_PORT")
-	pgUser := os.Getenv("DATABASE-USERNAME")
-	pgPass := os.Getenv("DATABASE-PASSWORD")
-	dbMode := os.Getenv("DATABASE-SSL-MODE")
-	dsn := fmt.Sprintf("user=%s password=%s host=%s dbname=%s  port=%s sslmode=%s", pgUser, pgPass, host,"postgres", pgPort, dbMode)
-
+	log := logs.NewLogger()
 	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	dsn := "host=postgresql-db user=admin password=test dbname=interview_accountapi port=5432 sslmode=disable"
+
+	Client, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic(err)
+		log.Infof("cannot connect to postgres: %v", err)
 	}
 
-	err = DB.AutoMigrate(models.AccountData{})
-	if err != nil {
-		fmt.Println(err)
-	}
+	log.Info("DATABASE Connected")
 }

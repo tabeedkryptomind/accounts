@@ -10,12 +10,13 @@ type AccountService struct {
 }
 
 func (a * AccountService)CreateAccount(ac models.AccountData)(models.AccountData,  error) {
-	panic("not implemented")
-
+	err := a.accRepo.Create(ac)
+	return ac, err
 }
 
 func (a * AccountService)FetchAccount()([]models.AccountData, error) {
-	panic("not implemented")
+	ac , err := a.accRepo.Fetch()
+	return ac, err
 }
 
 func (a * AccountService)DeleteAccount(int64 )(models.AccountData, error){

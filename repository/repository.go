@@ -4,7 +4,7 @@ import "github.com/form3tech-oss/interview-accountapi/models"
 
 
 type Account interface {
-	Create(models.AccountData)(models.AccountData, error)
+	Create(models.AccountData)error
 
 	Fetch()([]models.AccountData, error)
 	

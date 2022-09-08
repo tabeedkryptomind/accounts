@@ -1,45 +1,97 @@
-version: '3'
+# version: '3'
 
+# services:
+#   accountapi:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     restart: on-failure
+#     depends_on:
+#       - postgresql
+#       - vault
+#     environment:
+#       - VAULT_ADDR=http://vault:8200
+#       - VAULT_TOKEN=8fb95528-57c6-422e-9722-d2147bcba8ed
+#       - PSQL_USER=root
+#       - PSQL_PASSWORD=password
+#       - PSQL_HOST=postgresql
+#       - PSQL_PORT=5432
+#       - STACK_NAME=f3-interview-accountapi
+#       - DATABASE-HOST=postgresql
+#       - DATABASE-SSL-MODE=disable
+#       - DATABASE-USERNAME=interview_accountapi_user
+#       - DATABASE-PASSWORD=123
+#     ports:
+#       - 8080:8080
+#   postgresql:
+#     image: postgres:9.5-alpine
+#     container_name: postgresql
+#     healthcheck:
+#       test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
+#       timeout: 45s
+#       interval: 10s
+#       retries: 10
+#     restart: always
+#     environment:
+#       - POSTGRES_USER=root
+#       - POSTGRES_PASSWORD=password
+#     volumes:
+#       - ./scripts/db:/docker-entrypoint-initdb.d/
+
+#   vault:
+#     image: vault:1.6.3
+#     environment:
+#       - SKIP_SETCAP=1
+#       - VAULT_DEV_ROOT_TOKEN_ID=8fb95528-57c6-422e-9722-d2147bcba8ed
+
+
+version: '3.3'
 services:
+  db:
+    image: postgres
+    container_name: postgresql-db
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=test
+    ports:
+      - '5432:5432'
+    volumes: 
+      - ./scripts/db:/docker-entrypoint-initdb.d/
+    networks:
+      - postsql
+    
+  pgadmin:
+        image: dpage/pgadmin4:4.23
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+            PGADMIN_DEFAULT_PASSWORD: password
+            PGADMIN_LISTEN_PORT: 80
+        ports:
+            - 80:80
+        volumes:
+            - pgadmin:/var/lib/pgadmin
+        depends_on: 
+         - db
+        networks:
+          - postsql
+
   accountapi:
+    depends_on:
+    - db
     build:
       context: .
       dockerfile: Dockerfile
-    restart: on-failure
-    depends_on:
-      - postgresql
-      - vault
-    environment:
-      - VAULT_ADDR=http://vault:8200
-      - VAULT_TOKEN=8fb95528-57c6-422e-9722-d2147bcba8ed
-      - PSQL_USER=root
-      - PSQL_PASSWORD=password
-      - PSQL_HOST=postgresql
-      - PSQL_PORT=5432
-      - STACK_NAME=f3-interview-accountapi
-      - DATABASE-HOST=postgresql
-      - DATABASE-SSL-MODE=disable
-      - DATABASE-USERNAME=interview_accountapi_user
-      - DATABASE-PASSWORD=123
     ports:
-      - 8080:8080
-  postgresql:
-    image: postgres:9.5-alpine
-    container_name: postgresql
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "root" ]
-      timeout: 45s
-      interval: 10s
-      retries: 10
-    restart: always
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=password
-    volumes:
-      - ./scripts/db:/docker-entrypoint-initdb.d/
+     - 8080:8080
+    networks:
+      - postsql
+ 
 
-  vault:
-    image: vault:1.6.3
-    environment:
-      - SKIP_SETCAP=1
-      - VAULT_DEV_ROOT_TOKEN_ID=8fb95528-57c6-422e-9722-d2147bcba8ed
+volumes:
+  postgress:
+  pgadmin:
+
+networks:
+    postsql:
+    
