@@ -11,7 +11,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -o accounts .
 
 
-FROM alpine:3.15
+FROM alpine:3.16
 
 WORKDIR /app
 
